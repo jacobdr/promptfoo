@@ -48,8 +48,17 @@ jobs:
         run: |
           npm exec check-dependency-version-consistency
 
+      - name: Compile
+        run: |
+          npm run compile
+
       - name: Test
         run: npm run test --ci --coverage --maxWorkers=2
 
       - name: Build
         run: npm run build
+
+      - name: Integration Test
+        run: |
+          bash test/integration/run-integration-test.sh
+          PACKAGE_VERSION=$(cat package.json | jq -r '.version')

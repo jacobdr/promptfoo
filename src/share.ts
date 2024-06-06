@@ -1,4 +1,3 @@
-import { fetchWithProxy } from './fetch';
 import { REMOTE_API_BASE_URL, REMOTE_APP_BASE_URL } from './constants';
 
 import type { EvaluateSummary, SharedResults, UnifiedConfig } from './types';
@@ -19,7 +18,7 @@ export async function createShareableUrl(
 
   const apiBaseUrl =
     typeof config.sharing === 'object' ? config.sharing.apiBaseUrl : REMOTE_API_BASE_URL;
-  const response = await fetchWithProxy(`${apiBaseUrl}/api/eval`, {
+  const response = await fetch(`${apiBaseUrl}/api/eval`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

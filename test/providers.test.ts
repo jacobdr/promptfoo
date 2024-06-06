@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import fetch from 'node-fetch';
 import child_process from 'child_process';
 import Stream from 'stream';
 
@@ -52,11 +51,6 @@ jest.mock('fs', () => ({
 
 jest.mock('glob', () => ({
   globSync: jest.fn(),
-}));
-
-jest.mock('node-fetch', () => jest.fn());
-jest.mock('proxy-agent', () => ({
-  ProxyAgent: jest.fn().mockImplementation(() => ({})),
 }));
 
 jest.mock('../src/esm');

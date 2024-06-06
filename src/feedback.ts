@@ -1,7 +1,6 @@
 import readline from 'readline';
 
 import logger from './logger';
-import { fetchWithProxy } from './fetch';
 import { REMOTE_API_BASE_URL } from './constants';
 
 export function gatherFeedback(message?: string) {
@@ -30,7 +29,7 @@ export function gatherFeedback(message?: string) {
 }
 
 export async function sendFeedback(feedback: string) {
-  const resp = await fetchWithProxy(`${REMOTE_API_BASE_URL}/api/feedback`, {
+  const resp = await fetch(`${REMOTE_API_BASE_URL}/api/feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

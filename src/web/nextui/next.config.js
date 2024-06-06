@@ -1,7 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: process.env.NEXT_PUBLIC_PROMPTFOO_BUILD_STANDALONE_SERVER ? 'standalone' : 'export',
+  // output: 'standalone',
   trailingSlash: true,
+  productionBrowserSourceMaps: true,
+  env: {
+    NEXT_PUBLIC_SUPABASE_URL:
+      process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://placeholder.promptfoo.dev',
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder',
+  },
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     config.externals.push({
       'utf-8-validate': 'commonjs utf-8-validate',

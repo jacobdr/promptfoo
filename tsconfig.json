@@ -13,7 +13,9 @@
     "resolveJsonModule": true,
     "allowJs": true,
     "incremental": true,
-    "composite": true
+    "composite": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true
   },
   "references": [{ "path": "./src/web/nextui" }],
   "include": ["package.json", "src/**/*", "typings/**/*"],

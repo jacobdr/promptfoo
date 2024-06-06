@@ -283,7 +283,7 @@ async function main() {
   program
     .command('view [directory]')
     .description('Start browser ui')
-    .option('-p, --port <number>', 'Port number', '15500')
+    .option('-p, --port <number>', 'Port number will default to 15500 if not supplied')
     .option('-y, --yes', 'Skip confirmation and auto-open the URL')
     .option('--api-base-url <url>', 'Base URL for viewer API calls')
     .option('--filter-description <pattern>', 'Filter evals by description using a regex pattern')
@@ -310,7 +310,12 @@ async function main() {
           setConfigDirectoryPath(directory);
         }
         // Block indefinitely on server
-        await startServer(cmdObj.port, cmdObj.apiBaseUrl, cmdObj.yes, cmdObj.filterDescription);
+        await startServer({
+          port: cmdObj.port,
+          apiBaseUrl: cmdObj.apiBaseUrl,
+          skipOpenBrowserConfirmation: cmdObj.yes,
+          filterDescription: cmdObj.filterDescription,
+        });
       },
     );
 

@@ -563,8 +563,10 @@ export interface Scenario {
 }
 
 // Same as a TestCase, except the `vars` object has been flattened into its final form.
-export interface AtomicTestCase<Vars = Record<string, string | object>> extends TestCase {
-  vars?: Record<string, string | object>;
+export interface AtomicTestCase<
+  Vars extends Record<string, string | object> = Record<string, string | object>,
+> extends TestCase {
+  vars?: Vars;
 }
 
 export type NunjucksFilterMap = Record<string, (...args: any[]) => string>;

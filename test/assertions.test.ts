@@ -1,9 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import child_process from 'child_process';
-import Stream from 'stream';
 
-import { Response } from 'node-fetch';
 import { runAssertions, runAssertion } from '../src/assertions';
 import { assertionFromString } from '../src/csv';
 import * as fetch from '../src/fetch';
@@ -17,11 +14,6 @@ import type {
 } from '../src/types';
 import { OpenAiChatCompletionProvider } from '../src/providers/openai';
 import * as pythonWrapper from '../src/python/wrapper';
-import cliState from '../src/cliState';
-
-jest.mock('proxy-agent', () => ({
-  ProxyAgent: jest.fn().mockImplementation(() => ({})),
-}));
 
 jest.mock('glob', () => ({
   globSync: jest.fn(),
@@ -591,7 +583,7 @@ describe('runAssertion', () => {
   });
 
   it('should fail when the equality assertion with object fails', async () => {
-    const output = { key: "not value" };
+    const output = { key: 'not value' };
 
     const result: GradingResult = await runAssertion({
       prompt: 'Some prompt',
@@ -601,7 +593,9 @@ describe('runAssertion', () => {
       output,
     });
     expect(result.pass).toBeFalsy();
-    expect(result.reason).toBe(`Expected output \"{\"key\":\"value\"}\" to equal \"{\"key\":\"not value\"}\"`);
+    expect(result.reason).toBe(
+      `Expected output \"{\"key\":\"value\"}\" to equal \"{\"key\":\"not value\"}\"`,
+    );
   });
 
   it('should pass when the equality assertion with object passes with external json', async () => {
@@ -610,7 +604,7 @@ describe('runAssertion', () => {
       value: 'file:///output.json',
     };
 
-    (fs.readFileSync as jest.Mock).mockReturnValue(JSON.stringify({"key": "value"}));
+    (fs.readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ key: 'value' }));
 
     const output = '{"key": "value"}';
 
@@ -632,7 +626,7 @@ describe('runAssertion', () => {
       value: 'file:///output.json',
     };
 
-    (fs.readFileSync as jest.Mock).mockReturnValue(JSON.stringify({"key": "value"}));
+    (fs.readFileSync as jest.Mock).mockReturnValue(JSON.stringify({ key: 'value' }));
 
     const output = '{"key": "not value"}';
 
@@ -645,7 +639,9 @@ describe('runAssertion', () => {
     });
     expect(fs.readFileSync).toHaveBeenCalledWith(path.resolve('/output.json'), 'utf8');
     expect(result.pass).toBeFalsy();
-    expect(result.reason).toBe(`Expected output \"{\"key\":\"value\"}\" to equal \"{\"key\": \"not value\"}\"`);
+    expect(result.reason).toBe(
+      `Expected output \"{\"key\":\"value\"}\" to equal \"{\"key\": \"not value\"}\"`,
+    );
   });
 
   it('should pass when the is-json assertion passes', async () => {

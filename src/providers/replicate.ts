@@ -1,6 +1,5 @@
 import Replicate from 'replicate';
 
-import fetch from 'node-fetch';
 import logger from '../logger';
 import { getCache, isCacheEnabled } from '../cache';
 

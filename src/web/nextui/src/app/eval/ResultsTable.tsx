@@ -31,15 +31,11 @@ import GenerateTestCases from '@/app/eval/GenerateTestCases';
 import { getApiBaseUrl } from '@/api';
 import { useStore as useResultsViewStore } from './store';
 import { useStore as useMainStore } from '@/app/eval/store';
+import Image from 'next/image';
 
 import type { CellContext, ColumnDef, VisibilityState } from '@tanstack/table-core';
 
-import {
-  EvaluateTableRow,
-  EvaluateTableOutput,
-  FilterMode,
-  EvaluateTable,
-} from './types';
+import { EvaluateTableRow, EvaluateTableOutput, FilterMode, EvaluateTable } from './types';
 
 import './ResultsTable.css';
 
@@ -210,10 +206,10 @@ function EvalOutputCell({
       const url = imageUrlMatch[1];
       node = (
         <>
-          <img loading="lazy" src={url} alt={output.prompt} onClick={toggleLightbox} />
+          <Image loading="lazy" src={url} alt={output.prompt} onClick={toggleLightbox} />
           {lightboxOpen && (
             <div className="lightbox" onClick={toggleLightbox}>
-              <img src={url} alt={output.prompt} />
+              <Image src={url} alt={output.prompt} />
             </div>
           )}
         </>
@@ -680,8 +676,8 @@ function ResultsTable({
                   );
                 })
               : filterMode === 'different'
-              ? !row.outputs.every((output) => output.text === row.outputs[0].text)
-              : true;
+                ? !row.outputs.every((output) => output.text === row.outputs[0].text)
+                : true;
 
           const outputsMatchSearch = searchText
             ? row.outputs.some((output) => {

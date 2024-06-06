@@ -8,8 +8,6 @@ import logger from './logger';
 import { fetchWithRetries } from './fetch';
 import { getConfigDirectoryPath } from './util';
 
-import type { RequestInfo, RequestInit } from 'node-fetch';
-
 let cacheInstance: Cache | undefined;
 
 let enabled =

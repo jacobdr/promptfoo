@@ -27,10 +27,9 @@ export async function fetchCsvFromGoogleSheet(url: string): Promise<CsvRow[]> {
 
 export async function fetchCsvFromGoogleSheetUnauthenticated(url: string): Promise<CsvRow[]> {
   const { parse: parseCsv } = await import('csv-parse/sync');
-  const { fetchWithProxy } = await import('./fetch');
 
   const csvUrl = url.replace(/\/edit.*$/, '/export?format=csv');
-  const response = await fetchWithProxy(csvUrl);
+  const response = await fetch(csvUrl);
   if (response.status !== 200) {
     throw new Error(`Failed to fetch CSV from Google Sheets URL: ${url}`);
   }

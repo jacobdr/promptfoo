@@ -11,10 +11,6 @@ import {
 
 import type { ApiProvider, TestSuite, Prompt } from '../src/types';
 
-jest.mock('node-fetch', () => jest.fn());
-jest.mock('proxy-agent', () => ({
-  ProxyAgent: jest.fn().mockImplementation(() => ({})),
-}));
 jest.mock('glob', () => ({
   globSync: jest.fn(),
 }));
@@ -477,7 +473,7 @@ describe('evaluator', () => {
     expect(summary.stats.failures).toBe(0);
     expect(summary.results[0].response?.output).toBe(123);
   });
-  
+
   test('evaluate with provider transform', async () => {
     const mockApiProviderWithTransform: ApiProvider = {
       id: jest.fn().mockReturnValue('test-provider-transform'),
