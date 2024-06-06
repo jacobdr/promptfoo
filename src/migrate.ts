@@ -10,7 +10,11 @@ function isMain(): boolean {
     // CommonJS environment
     return true;
   } else if (
+    // @ts-expect-error in a CJS setting this will fail
+    typeof global['import'] !== 'undefined' &&
+    // @ts-ignore in a CJS setting this will fail
     typeof import.meta !== 'undefined' &&
+    // @ts-ignore in a CJS setting this will fail
     import.meta.url === `file://${process.argv[1]}`
   ) {
     // ESM environment
