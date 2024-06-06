@@ -2,7 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import CodeBlock from '@theme/CodeBlock';
-import Image from 'next/image'
+import Image from 'next/image';
 
 import styles from './styles.module.css';
 
@@ -31,7 +31,11 @@ export default function HomepageInfo(): JSX.Element {
               src="/img/brands/salesforce-logo.svg"
               alt="Salesforce"
             />
-            <Image style={{ maxHeight: '120px' }} src="/img/brands/carvana-logo.svg" alt="Carvana" />
+            <Image
+              style={{ maxHeight: '120px' }}
+              src="/img/brands/carvana-logo.svg"
+              alt="Carvana"
+            />
           </div>
         </div>
       </section>
