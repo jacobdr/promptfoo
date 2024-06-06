@@ -78,6 +78,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           target: cli
+          context: .
           push: false
           load: true
           tags: promptfoo:cli
@@ -89,6 +90,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           target: site
+          context: .
           push: false
           load: true
           tags: promptfoo:site
@@ -106,7 +108,7 @@ jobs:
             echo "Received: ${VERSION_OUTPUT}"
             exit 1
           fi
-          docker run -v "${TEST_DIR}:${TEST_DIR}" promptfoo:cli init "${TEST_DIR}"
+          docker run -it -v "${TEST_DIR}:${TEST_DIR}" promptfoo:cli init "${TEST_DIR}"
           if [[ ! -f "${TEST_DIR}/promptfooconfig.yaml" ]]; then
             echo "Expected config file to get generated to ${TEST_DIR} but it was not found"
             exit 1
