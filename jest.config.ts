@@ -27,10 +27,10 @@ const config: Config = {
   transformIgnorePatterns: [
     'node_modules/(?!(chalk|data-uri-to-buffer|fetch-blob|formdata-polyfill))',
   ],
-  // transform: {
-  //   '^.+\\.js$': 'babel-jest',
-  //   '^.+\\.m?[tj]sx?$': ['ts-jest', tsJestConfig],
-  // },
+  transform: {
+    // '^.+\\.js$': 'babel-jest',
+    '^.+\\.m?[tj]sx?$': ['ts-jest', tsJestConfig],
+  },
   verbose: true,
 };
 
