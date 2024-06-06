@@ -13,6 +13,7 @@ env:
   OPENAI_API_KEY: xxx
   AZURE_OPENAI_API_HOST: xxx
   ANTHROPIC_API_KEY: xxx
+
 jobs:
   build:
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
@@ -62,3 +63,54 @@ jobs:
         run: |
           bash test/integration/run-integration-test.sh
           PACKAGE_VERSION=$(cat package.json | jq -r '.version')
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      # The PORT for the UI to run on
+      DEFAULT_PORT: 15500
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      # https://github.com/marketplace/actions/docker-setup-buildx
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v3
+      - name: 'Build Image: CLI'
+        uses: docker/build-push-action@v5
+        with:
+          target: cli
+          push: false
+          load: true
+          tags: promptfoo:cli
+          cache-from: |
+            type=gha
+          cache-to: |
+            type=gha,mode=max
+      - name: 'Build Image: Site'
+        uses: docker/build-push-action@v5
+        with:
+          target: site
+          push: false
+          load: true
+          tags: promptfoo:site
+          cache-from: |
+            type=gha
+      - name: 'Test: CLI'
+        run: |
+          TEST_DIR="${PWD}/test_project"
+          EXPECTED_VERSION=$(cat package.json | jq -r '.version')
+          VERSION_OUTPUT=$(docker run -it --rm promptfoo:cli --version)
+          if ! grep "${EXPECTED_VERSION}" <<< $VERSION_OUTPUT; then
+            echo "Exepected version not found in --version output"
+            echo "Expected: ${EXPECTED_VERSION}"
+            echo "===="
+            echo "Received: ${VERSION_OUTPUT}"
+            exit 1
+          fi
+          docker run -v "${TEST_DIR}:${TEST_DIR}" promptfoo:cli init "${TEST_DIR}"
+          if [[ ! -f "${TEST_DIR}/promptfooconfig.yaml" ]]; then
+            echo "Expected config file to get generated to ${TEST_DIR} but it was not found"
+            exit 1
+          fi
+      - name: 'Test: Site'
+        run: |
+          docker run --detach prompfoo:site

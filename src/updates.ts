@@ -28,7 +28,7 @@ export async function checkForUpdates(): Promise<boolean> {
     return false;
   }
   if (semverGt(latestVersion, VERSION)) {
-    const border = '='.repeat(process.stdout.columns - 10);
+    const border = '='.repeat(process.stdout.columns || 20 - 10);
     logger.info(
       `\n${border}
 ${chalk.yellow('⚠️')} The current version of promptfoo ${chalk.yellow(

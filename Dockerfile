@@ -57,10 +57,15 @@ RUN npm prune --production
 
 FROM package-jsons as cli
 
+# This loads the ash profile
+ENV ENV="/root/.profile"
+RUN echo 'alias promptfoo="node /app/dist/build/main.cjs"' > /root/.profile
+
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/dist /app/dist
+COPY --from=builder /app/package.json /app/dist/package.json
 
-ENTRYPOINT ["tini",  "--", "node", "./dist/build/main.cjs"]
+ENTRYPOINT ["tini",  "--", "node", "/app/dist/build/main.cjs"]
 
 
 # ---- Final Stage ----
