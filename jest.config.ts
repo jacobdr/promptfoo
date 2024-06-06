@@ -5,15 +5,15 @@ import type { TsJestTransformerOptions } from 'ts-jest';
 const tsJestConfig: TsJestTransformerOptions & Record<string, unknown> = { useESM: true };
 
 const config: Config = {
-  transform: {
-    '^.+\\.m?[tj]sx?$': ['ts-jest', tsJestConfig],
-  },
+  collectCoverage: true,
+  coverageDirectory: '.coverage',
+  coverageProvider: 'v8',
+  extensionsToTreatAsEsm: ['.ts'],
   /*
   moduleNameMapper: {
     '(.+)\\.js': '$1',
   },
   */
-  extensionsToTreatAsEsm: ['.ts'],
   setupFiles: ['<rootDir>/.jest/setEnvVars.js', '<rootDir>/.jest/mockFetch.js'],
   testPathIgnorePatterns: [
     '<rootDir>/examples',
@@ -27,6 +27,10 @@ const config: Config = {
   transformIgnorePatterns: [
     'node_modules/(?!(chalk|data-uri-to-buffer|fetch-blob|formdata-polyfill))',
   ],
+  // transform: {
+  //   '^.+\\.js$': 'babel-jest',
+  //   '^.+\\.m?[tj]sx?$': ['ts-jest', tsJestConfig],
+  // },
   verbose: true,
 };
 

@@ -47,6 +47,15 @@ type OpenAiCompletionOptions = OpenAiSharedOptions & {
   stop?: string[];
   seed?: number;
   passthrough?: object;
+
+  /**
+   * If set, automatically call these functions when the assistant activates
+   * these function tools.
+   */
+  functionToolCallbacks?: Record<
+    OpenAI.FunctionDefinition['name'],
+    (arg: string) => Promise<string>
+  >;
 };
 
 function failApiCall(err: any) {
@@ -93,7 +102,9 @@ export class OpenAiGenericProvider implements ApiProvider {
   }
 
   id(): string {
-    return `openai:${this.modelName}`;
+    return this.config.apiHost || this.config.apiBaseUrl
+      ? this.modelName
+      : `openai:${this.modelName}`;
   }
 
   toString(): string {
@@ -476,6 +487,31 @@ export class OpenAiChatCompletionProvider extends OpenAiGenericProvider {
       const logProbs = data.choices[0].logprobs?.content?.map(
         (logProbObj: { token: string; logprob: number }) => logProbObj.logprob,
       );
+
+      // Handle function tool callbacks
+      const functionCalls = message.function_call ? [message.function_call] : message.tool_calls;
+      if (functionCalls && this.config.functionToolCallbacks) {
+        for (const functionCall of functionCalls) {
+          const functionName = functionCall.name;
+          if (this.config.functionToolCallbacks[functionName]) {
+            const functionResult = await this.config.functionToolCallbacks[functionName](
+              message.function_call.arguments,
+            );
+            return {
+              output: functionResult,
+              tokenUsage: getTokenUsage(data, cached),
+              cached,
+              logProbs,
+              cost: calculateCost(
+                this.modelName,
+                this.config,
+                data.usage?.prompt_tokens,
+                data.usage?.completion_tokens,
+              ),
+            };
+          }
+        }
+      }
 
       return {
         output,
@@ -952,11 +988,11 @@ export class OpenAiModerationProvider
 }
 
 export const DefaultEmbeddingProvider = new OpenAiEmbeddingProvider('text-embedding-3-large');
-export const DefaultGradingProvider = new OpenAiChatCompletionProvider('gpt-4-0125-preview');
-export const DefaultGradingJsonProvider = new OpenAiChatCompletionProvider('gpt-4-0125-preview', {
+export const DefaultGradingProvider = new OpenAiChatCompletionProvider('gpt-4o');
+export const DefaultGradingJsonProvider = new OpenAiChatCompletionProvider('gpt-4o', {
   config: {
     response_format: { type: 'json_object' },
   },
 });
-export const DefaultSuggestionsProvider = new OpenAiChatCompletionProvider('gpt-4-0125-preview');
+export const DefaultSuggestionsProvider = new OpenAiChatCompletionProvider('gpt-4o');
 export const DefaultModerationProvider = new OpenAiModerationProvider('text-moderation-latest');

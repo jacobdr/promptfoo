@@ -14,7 +14,7 @@ import compression from 'compression';
 import opener from 'opener';
 import { Server as SocketIOServer } from 'socket.io';
 import promptfoo, {
-  EvaluateTestSuite,
+  EvaluateTestSuiteWithEvaluateOptions,
   Job,
   Prompt,
   PromptWithMetadata,
@@ -48,8 +48,14 @@ let allPrompts: PromptWithMetadata[] | null = null;
 interface IServerOptions {
   port?: number;
   apiBaseUrl?: string;
-  skipOpenBrowserConfirmation?: boolean;
+  browserBehavior: BrowserBehavior;
   filterDescription?: string;
+}
+
+export enum BrowserBehavior {
+  ASK = 0,
+  OPEN = 1,
+  SKIP = 2,
 }
 
 const DEFAULT_SERVER_PORT = 15500;
@@ -133,7 +139,7 @@ export async function startServer(options: IServerOptions) {
   });
 
   app.post('/api/eval/job', (req, res) => {
-    const testSuite = req.body as EvaluateTestSuite;
+    const { evaluateOptions, ...testSuite } = req.body as EvaluateTestSuiteWithEvaluateOptions;
     const id = uuidv4();
     evalJobs.set(id, { status: 'in-progress', progress: 0, total: 0, result: null });
 
@@ -143,16 +149,16 @@ export async function startServer(options: IServerOptions) {
           writeLatestResults: true,
           sharing: testSuite.sharing ?? true,
         }),
-        {
+        Object.assign({}, evaluateOptions, {
           eventSource: 'web',
-          progressCallback: (progress, total) => {
+          progressCallback: (progress: number, total: number) => {
             const job = evalJobs.get(id);
             invariant(job, 'Job not found');
             job.progress = progress;
             job.total = total;
             console.log(`[${id}] ${progress}/${total}`);
           },
-        },
+        }),
       )
       .then((result) => {
         const job = evalJobs.get(id);
@@ -272,9 +278,9 @@ export async function startServer(options: IServerOptions) {
       }
     };
 
-    if (options.skipOpenBrowserConfirmation) {
+    if (options.browserBehavior === BrowserBehavior.OPEN) {
       openUrl();
-    } else {
+    } else if (options.browserBehavior === BrowserBehavior.ASK) {
       const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,

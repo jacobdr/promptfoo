@@ -34,7 +34,7 @@ import {
 import { DEFAULT_README, DEFAULT_YAML_CONFIG } from './onboarding';
 import { disableCache, clearCache } from './cache';
 import { getDirectory } from './esm';
-import { startServer } from './web/server';
+import { BrowserBehavior, startServer } from './web/server';
 import { checkForUpdates } from './updates';
 import { gatherFeedback } from './feedback';
 import { listCommand } from './commands/list';
@@ -285,6 +285,7 @@ async function main() {
     .description('Start browser ui')
     .option('-p, --port <number>', 'Port number will default to 15500 if not supplied')
     .option('-y, --yes', 'Skip confirmation and auto-open the URL')
+    .option('-n, --no', 'Skip confirmation and do not open the URL')
     .option('--api-base-url <url>', 'Base URL for viewer API calls')
     .option('--filter-description <pattern>', 'Filter evals by description using a regex pattern')
     .option('--env-file <path>', 'Path to .env file')
@@ -294,6 +295,7 @@ async function main() {
         cmdObj: {
           port: number;
           yes: boolean;
+          no: boolean;
           apiBaseUrl?: string;
           envFile?: string;
           filterDescription?: string;
@@ -310,10 +312,16 @@ async function main() {
           setConfigDirectoryPath(directory);
         }
         // Block indefinitely on server
+        const browserBehavior = cmdObj.yes
+          ? BrowserBehavior.OPEN
+          : cmdObj.no
+            ? BrowserBehavior.SKIP
+            : BrowserBehavior.ASK;
+
         await startServer({
           port: cmdObj.port,
           apiBaseUrl: cmdObj.apiBaseUrl,
-          skipOpenBrowserConfirmation: cmdObj.yes,
+          browserBehavior,
           filterDescription: cmdObj.filterDescription,
         });
       },
@@ -619,7 +627,10 @@ async function main() {
     .option('-a, --assertions <path>', 'Path to assertions file')
     .option('--model-outputs <path>', 'Path to JSON containing list of LLM output strings')
     .option('-t, --tests <path>', 'Path to CSV with test cases')
-    .option('-o, --output <paths...>', 'Path to output file (csv, txt, json, yaml, yml, html)')
+    .option(
+      '-o, --output <paths...>',
+      'Path to output file (csv, txt, json, yaml, yml, html), default is no output file',
+    )
     .option(
       '-j, --max-concurrency <number>',
       'Maximum number of concurrent API calls',
@@ -794,27 +805,30 @@ async function main() {
           );
         }
 
+        await migrateResultsFromFileSystemToDatabase();
+
+        let evalId: string | null = null;
+        if (cmdObj.write) {
+          evalId = await writeResultsToDatabase(summary, config);
+        }
+
         const { outputPath } = config;
         if (outputPath) {
           // Write output to file
           if (typeof outputPath === 'string') {
-            await writeOutput(outputPath, summary, config, shareableUrl);
+            await writeOutput(outputPath, evalId, summary, config, shareableUrl);
           } else if (Array.isArray(outputPath)) {
-            await writeMultipleOutputs(outputPath, summary, config, shareableUrl);
+            await writeMultipleOutputs(outputPath, evalId, summary, config, shareableUrl);
           }
           logger.info(chalk.yellow(`Writing output to ${outputPath}`));
         }
 
         telemetry.maybeShowNotice();
 
-        await migrateResultsFromFileSystemToDatabase();
-
         printBorder();
         if (!cmdObj.write) {
           logger.info(`${chalk.green('✔')} Evaluation complete`);
         } else {
-          await writeResultsToDatabase(summary, config);
-
           if (shareableUrl) {
             logger.info(`${chalk.green('✔')} Evaluation complete: ${shareableUrl}`);
           } else {

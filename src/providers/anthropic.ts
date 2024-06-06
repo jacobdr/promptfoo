@@ -8,6 +8,7 @@ import { parseChatPrompt } from './shared';
 
 interface AnthropicMessageOptions {
   apiKey?: string;
+  apiBaseUrl?: string;
   temperature?: number;
   max_tokens?: number;
   top_p?: number;
@@ -152,7 +153,7 @@ export class AnthropicMessagesProvider implements ApiProvider {
     this.id = id ? () => id : this.id;
     this.config = config || {};
     this.apiKey = config?.apiKey || env?.ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY;
-    this.anthropic = new Anthropic({ apiKey: this.apiKey });
+    this.anthropic = new Anthropic({ apiKey: this.apiKey, baseURL: this.config.apiBaseUrl });
   }
 
   id(): string {

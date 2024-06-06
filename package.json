@@ -2,7 +2,7 @@
   "name": "promptfoo",
   "description": "LLM eval & testing toolkit",
   "author": "Ian Webster",
-  "version": "0.61.0",
+  "version": "0.62.1",
   "license": "MIT",
   "type": "commonjs",
   "repository": "promptfoo/promptfoo",
@@ -44,9 +44,11 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "format": "prettier -w .",
+    "format:check": "prettier --check .",
     "db:migrate": "npx tsx src/migrate.ts",
     "db:generate": "npx drizzle-kit generate:sqlite",
-    "audit:fix": "npm audit fix && cd src/web/nextui && npm audit fix && cd ../../site && npm audit fix"
+    "audit:fix": "npm audit fix && cd src/web/nextui && npm audit fix && cd ../../site && npm audit fix",
+    "prepublishOnly": "npm run build:clean && npm run build"
   },
   "peerDependencies": {
     "@aws-sdk/client-bedrock-runtime": "^3.458.0",
