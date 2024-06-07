@@ -30,7 +30,7 @@
   },
   "scripts": {
     "bin": "dist/build/main.cjs",
-    "compile": "tsc --build --verbose",
+    "compile": "tsc --build --verbose && tsc --build ./src/web/nextui --verbose",
     "local": "tsx src/main.ts",
     "local:web": "cd src/web/nextui && npm run dev",
     "build:clean": "shx rm -rf dist",

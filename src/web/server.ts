@@ -92,6 +92,8 @@ export async function startServer(options: IServerOptions) {
   });
 
   const io = new SocketIOServer(httpServer, {
+    // @ts-ignore weird behavior -- the nextui compilation does not like this, but the
+    // top-level compilation is fine with it
     cors: {
       origin: '*',
     },
