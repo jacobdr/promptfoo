@@ -100,7 +100,7 @@ jobs:
         run: |
           TEST_DIR="${PWD}/test_project"
           EXPECTED_VERSION=$(cat package.json | jq -r '.version')
-          VERSION_OUTPUT=$(docker run -it --rm promptfoo:cli --version)
+          VERSION_OUTPUT=$(docker run --rm promptfoo:cli --version)
           if ! grep "${EXPECTED_VERSION}" <<< $VERSION_OUTPUT; then
             echo "Exepected version not found in --version output"
             echo "Expected: ${EXPECTED_VERSION}"
@@ -108,7 +108,7 @@ jobs:
             echo "Received: ${VERSION_OUTPUT}"
             exit 1
           fi
-          docker run -it -v "${TEST_DIR}:${TEST_DIR}" promptfoo:cli init "${TEST_DIR}"
+          docker run -v "${TEST_DIR}:${TEST_DIR}" promptfoo:cli init "${TEST_DIR}"
           if [[ ! -f "${TEST_DIR}/promptfooconfig.yaml" ]]; then
             echo "Expected config file to get generated to ${TEST_DIR} but it was not found"
             exit 1
