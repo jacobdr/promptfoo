@@ -20,6 +20,7 @@ function run_test_in_directory() {
 function main() {
     run_test_in_directory "${SCRIPT_DIR}/commonjs"
     run_test_in_directory "${SCRIPT_DIR}/esmodule"
+    run_test_in_directory "${SCRIPT_DIR}/typescript"
 }
 
 main

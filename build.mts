@@ -1,4 +1,5 @@
 import { build, type BuildOptions } from 'esbuild';
+import { copy } from 'esbuild-plugin-copy';
 
 import packageJson from './package.json' with { type: 'json' };
 
@@ -42,6 +43,29 @@ const esbuildCommonJsBuildConfig = {
   format: 'cjs',
   outExtension: { '.js': '.cjs' },
   external: externalDependenciesList,
+  // Arbitrarily choose CommonJS build to handle static asset copying -- could be either one
+  plugins: [
+    copy({
+      assets: [
+        {
+          from: 'src/python/wrapper.py',
+          to: 'python',
+        },
+        {
+          from: 'src/*.html',
+          to: '.',
+        },
+        {
+          from: 'drizzle/*.sql',
+          to: '../drizzle',
+        },
+        {
+          from: 'drizzle/meta/_journal.json',
+          to: '../drizzle/meta/_journal.json',
+        },
+      ],
+    }),
+  ],
 } as const satisfies BuildOptions;
 
 await Promise.all([build(esbuildEsmBuildConfig), build(esbuildCommonJsBuildConfig)]);

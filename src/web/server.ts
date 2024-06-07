@@ -92,7 +92,6 @@ export async function startServer(options: IServerOptions) {
   });
 
   const io = new SocketIOServer(httpServer, {
-    // @ts-expect-error bad typings from the socket.io library
     cors: {
       origin: '*',
     },

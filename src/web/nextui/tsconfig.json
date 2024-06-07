@@ -29,10 +29,9 @@
   },
   "include": [
     "./next-env.d.ts",
-    "../../../src/**/*.ts",
-    "../../../src/**/*.tsx",
+    "../../../src",
     ".next/types/**/*.ts",
-    "../../../typings/**/*",
+    "../../../typings",
     "../../../package.json"
   ],
   "exclude": ["node_modules", "./dist", "../../../dist"]

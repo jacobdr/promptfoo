@@ -1,0 +1,11 @@
+{
+  "name": "typescript-test",
+  "type": "commonjs",
+  "scripts": {
+    "postinstall": "tsc --build --verbose"
+  },
+  "dependencies": {
+    "promptfoo": "file:../../..",
+    "typescript": "*"
+  }
+}

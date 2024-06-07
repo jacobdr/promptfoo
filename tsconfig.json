@@ -14,16 +14,9 @@
     "allowJs": true,
     "incremental": true,
     "composite": true,
-    "noEmit": false,
-    "emitDeclarationOnly": true
+    "noEmit": false
   },
   "references": [{ "path": "./src/web/nextui" }],
-  "include": ["package.json", "src/**/*", "typings/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src/web/client/**/*",
-    "src/web/nextui/**/*",
-    "src/workers/**/*"
-  ]
+  "include": ["package.json", "src", "typings"],
+  "exclude": ["node_modules", "dist", "src/web/nextui"]
 }
