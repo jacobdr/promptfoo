@@ -50,7 +50,7 @@ COPY . .
 
 RUN npm run build && \
     # Remove the cache to keep the docker size as small as possible
-    rm -r /app/dist/build/web/nextui/.next/cache
+    rm -rf /app/dist/build/web/nextui/.next/cache
 
 RUN npm prune --production
 
