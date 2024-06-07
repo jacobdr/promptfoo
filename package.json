@@ -37,7 +37,7 @@
     "build:nextui": "shx mkdir -p dist/build/web/nextui && cd src/web/nextui && npm run build && shx cp -r public .next next.config.js ../../../dist/build/web/nextui",
     "build:cli": "tsx build.mts && shx chmod +x dist/build/main.cjs",
     "build:watch": "tsc --build --watch",
-    "build": "npm run build:clean && concurrently npm:build:cli npm:build:nextui",
+    "build": "npm run build:clean && concurrently npm:compile npm:build:cli npm:build:nextui",
     "test": "jest",
     "test:watch": "jest --watch",
     "format": "prettier -w .",
