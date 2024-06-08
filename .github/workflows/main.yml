@@ -124,6 +124,7 @@ jobs:
         run: |
           TEST_DIR="/tmp/test_project"
           echo "TEST_DIR:${TEST_DIR}"
+          mkdir -p "${TEST_DIR}"
           EXPECTED_VERSION=$(cat package.json | jq -r '.version')
           VERSION_OUTPUT=$(docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --rm promptfoo:cli --version)
           if ! grep "${EXPECTED_VERSION}" <<< $VERSION_OUTPUT; then
@@ -135,7 +136,7 @@ jobs:
           fi
 
           set -x
-          docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --volume "${TEST_DIR}:${TEST_DIR}" --workdir "${TEST_DIR}" promptfoo:cli init --no-interactive "${TEST_DIR}"
+          docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --volume "${TEST_DIR}:${TEST_DIR}" --workdir "${TEST_DIR}" promptfoo:cli init --no-interactive
           if [[ ! -f "${TEST_DIR}/promptfooconfig.yaml" ]]; then
             echo "Expected config file to get generated to ${TEST_DIR} but it was not found"
             exit 1
