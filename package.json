@@ -39,6 +39,7 @@
     "build:watch": "tsc --build --watch",
     "build:post": "shx rm -rf dist/build/web/nextui/.next/cache",
     "build": "npm run build:clean && concurrently npm:compile npm:build:cli npm:build:nextui && npm run build:post",
+    "build:docker": "docker build --target cli --tag promptfoo:cli . && docker build --target site --tag promptfoo:site .",
     "test": "jest",
     "test:watch": "jest --watch",
     "format": "prettier -w .",

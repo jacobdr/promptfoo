@@ -62,7 +62,7 @@ jobs:
       - name: Integration Test
         run: |
           bash test/integration/run-integration-test.sh
-          PACKAGE_VERSION=$(cat package.json | jq -r '.version')
+
   docker:
     runs-on: ubuntu-latest
     env:
@@ -108,7 +108,7 @@ jobs:
             echo "Received: ${VERSION_OUTPUT}"
             exit 1
           fi
-          docker run -v "${TEST_DIR}:${TEST_DIR}" promptfoo:cli init "${TEST_DIR}"
+          docker run -v "${TEST_DIR}:${TEST_DIR}" promptfoo:cli init --no-interactive "${TEST_DIR}"
           if [[ ! -f "${TEST_DIR}/promptfooconfig.yaml" ]]; then
             echo "Expected config file to get generated to ${TEST_DIR} but it was not found"
             exit 1
