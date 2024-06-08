@@ -77,10 +77,11 @@ jobs:
           du -sh dist
           du -s dist
           # 40 MB limit
-          PACKAGE_BYTE_LIMIT=40000
-          BYTE_SIZE_OF_PACKAGE=$(du -s dist | awk '{print $1}')
-          if [[ $BYTE_SIZE_OF_PACKAGE -gt  $PACKAGE_BYTE_LIMIT ]]; then
+          PACKAGE_BYTE_LIMIT_KB=40000
+          BYTE_SIZE_OF_PACKAGE=$(du -sk dist | awk '{print $1}')
+          if [[ $BYTE_SIZE_OF_PACKAGE -gt  $PACKAGE_BYTE_LIMIT_KB ]]; then
             echo "Package is too large! Either bump the maximum allowed size, or check your changes if you did not expect such a large increase"
+            echo "The KB limit is: ${PACKAGE_BYTE_LIMIT_KB}"
             exit 1
           fi
 
