@@ -1,1 +1,1 @@
-import {evaluate} from 'promptfoo';
+import { evaluate } from 'promptfoo';
