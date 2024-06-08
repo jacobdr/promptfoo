@@ -52,7 +52,7 @@ export function generateTable(summary: EvaluateSummary, tableCellMaxLength = 250
 
 export function wrapTable(rows: Record<string, string | number>[]) {
   const maxWidth = process.stdout.columns ? process.stdout.columns - 10 : 120;
-  const head = Object.keys(rows[0]);
+  const head = Object.keys(rows[0] || {});
   const table = new Table({
     head,
     colWidths: Array(head.length).fill(Math.floor(maxWidth / head.length)),

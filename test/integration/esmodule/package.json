@@ -1,0 +1,7 @@
+{
+  "name": "esmodule-test",
+  "type": "module",
+  "dependencies": {
+    "promptfoo": "file:../../.."
+  }
+}

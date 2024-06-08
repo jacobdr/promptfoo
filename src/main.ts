@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import chokidar from 'chokidar';
 import yaml from 'js-yaml';
 import { Command } from 'commander';
+import { version } from '../package.json';
 
 import cliState from './cliState';
 import telemetry from './telemetry';
@@ -219,12 +220,7 @@ async function main() {
 
   const program = new Command();
 
-  program.option('--version', 'Print version', () => {
-    const packageJson = JSON.parse(
-      fs.readFileSync(path.join(getDirectory(), '../package.json'), 'utf8'),
-    );
-    logger.info(packageJson.version);
-  });
+  program.version(version);
 
   program
     .command('init [directory]')
@@ -243,7 +239,7 @@ async function main() {
   program
     .command('view [directory]')
     .description('Start browser ui')
-    .option('-p, --port <number>', 'Port number', '15500')
+    .option('-p, --port <number>', 'Port number will default to 15500 if not supplied')
     .option('-y, --yes', 'Skip confirmation and auto-open the URL')
     .option('-n, --no', 'Skip confirmation and do not open the URL')
     .option('--api-base-url <url>', 'Base URL for viewer API calls')
@@ -275,14 +271,15 @@ async function main() {
         const browserBehavior = cmdObj.yes
           ? BrowserBehavior.OPEN
           : cmdObj.no
-          ? BrowserBehavior.SKIP
-          : BrowserBehavior.ASK;
-        await startServer(
-          cmdObj.port,
-          cmdObj.apiBaseUrl,
+            ? BrowserBehavior.SKIP
+            : BrowserBehavior.ASK;
+
+        await startServer({
+          port: cmdObj.port,
+          apiBaseUrl: cmdObj.apiBaseUrl,
           browserBehavior,
-          cmdObj.filterDescription,
-        );
+          filterDescription: cmdObj.filterDescription,
+        });
       },
     );
 

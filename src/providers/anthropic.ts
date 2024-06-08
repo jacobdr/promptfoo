@@ -1,7 +1,7 @@
 import Anthropic, { APIError } from '@anthropic-ai/sdk';
 import logger from '../logger';
 
-import type { ApiProvider, EnvOverrides, ProviderResponse, TokenUsage } from '../types.js';
+import type { ApiProvider, EnvOverrides, ProviderResponse, TokenUsage } from '../types';
 
 import { getCache, isCacheEnabled } from '../cache';
 import { parseChatPrompt } from './shared';
@@ -202,17 +202,23 @@ export class AnthropicMessagesProvider implements ApiProvider {
       const response = await this.anthropic.messages.create(params);
 
       logger.debug(`Anthropic Messages API response: ${JSON.stringify(response)}`);
+      const responseData = response.content[0];
+      if (responseData.type !== 'text') {
+        throw new Error(
+          `Expected response data to be of type text, but received: ${JSON.stringify(responseData)} `,
+        );
+      }
 
       if (isCacheEnabled()) {
         try {
-          await cache.set(cacheKey, JSON.stringify(response.content[0].text));
+          await cache.set(cacheKey, JSON.stringify(responseData.text));
         } catch (err) {
           logger.error(`Failed to cache response: ${String(err)}`);
         }
       }
 
       return {
-        output: response.content[0].text,
+        output: responseData.text,
         tokenUsage: getTokenUsage(response, false),
         cost: calculateCost(
           this.modelName,

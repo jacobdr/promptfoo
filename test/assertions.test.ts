@@ -1,9 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import child_process from 'child_process';
-import Stream from 'stream';
 
-import { Response } from 'node-fetch';
 import { runAssertions, runAssertion } from '../src/assertions';
 import { assertionFromString } from '../src/csv';
 import * as fetch from '../src/fetch';
@@ -17,11 +14,6 @@ import type {
 } from '../src/types';
 import { OpenAiChatCompletionProvider } from '../src/providers/openai';
 import * as pythonWrapper from '../src/python/wrapper';
-import cliState from '../src/cliState';
-
-jest.mock('proxy-agent', () => ({
-  ProxyAgent: jest.fn().mockImplementation(() => ({})),
-}));
 
 jest.mock('glob', () => ({
   globSync: jest.fn(),

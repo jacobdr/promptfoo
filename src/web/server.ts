@@ -1,9 +1,11 @@
 import fs, { Stats } from 'fs';
-import path from 'node:path';
 import readline from 'node:readline';
 import http from 'node:http';
 import invariant from 'tiny-invariant';
 import { v4 as uuidv4 } from 'uuid';
+import next from 'next';
+import { parse } from 'node:url';
+import path from 'node:path';
 
 import debounce from 'debounce';
 import express from 'express';
@@ -43,51 +45,89 @@ const evalJobs = new Map<string, Job>();
 // Prompts cache
 let allPrompts: PromptWithMetadata[] | null = null;
 
+interface IServerOptions {
+  port?: number;
+  apiBaseUrl?: string;
+  browserBehavior: BrowserBehavior;
+  filterDescription?: string;
+}
+
 export enum BrowserBehavior {
   ASK = 0,
   OPEN = 1,
   SKIP = 2,
 }
 
-export async function startServer(
-  port = 15500,
-  apiBaseUrl = '',
-  browserBehavior = BrowserBehavior.ASK,
-  filterDescription?: string,
-) {
-  const app = express();
+const DEFAULT_SERVER_PORT = 15500;
 
-  const staticDir = path.join(getDirectory(), 'web', 'nextui');
+/**
+ * Re-use the express server as the handler for the NextJS UI
+ */
+export async function startServer(options: IServerOptions) {
+  const port = options.port || Number.parseInt(process.env.PORT || '') || DEFAULT_SERVER_PORT;
+  const nextJsRootDir = path.join(getDirectory(), 'web/nextui');
+  const app = express();
 
   app.use(cors());
   app.use(compression());
   app.use(express.json({ limit: '100mb' }));
   app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
-  const httpServer = http.createServer(app);
+  // see https://github.com/trpc/examples-next-prisma-websockets-starter/blob/main/src/server/prodServer.ts
+  const isDev = process.argv[1]?.endsWith('src/main.ts') || false;
+  const nextApp = next({ dev: isDev, dir: nextJsRootDir });
+  const handle = nextApp.getRequestHandler();
+  await nextApp.prepare();
+
+  const httpServer = http.createServer(async (req, res) => {
+    if (!req.url) return;
+    if (req.url.startsWith('/api')) {
+      return await app(req, res);
+    } else {
+      const parsedUrl = parse(req.url, true);
+      return await handle(req, res, parsedUrl);
+    }
+  });
+
   const io = new SocketIOServer(httpServer, {
+    // @ts-ignore weird behavior -- the nextui compilation does not like this, but the
+    // top-level compilation is fine with it
     cors: {
       origin: '*',
     },
   });
+
+  process.on('SIGINT', () => {
+    console.log('SIGINT received, exiting');
+    process.exit(0);
+  });
+
+  // Keep the next.js upgrade handler from being added to our custom server
+  // so sockets stay open even when not HMR.
+  const originalOn = httpServer.on.bind(httpServer);
+  httpServer.on = function (event, listener) {
+    if (event !== 'upgrade') return originalOn(event, listener);
+    return httpServer;
+  };
 
   await migrateResultsFromFileSystemToDatabase();
 
   const watchFilePath = getDbSignalPath();
   const watcher = debounce(async (curr: Stats, prev: Stats) => {
     if (curr.mtime !== prev.mtime) {
-      io.emit('update', await readLatestResults(filterDescription));
+      io.emit('update', await readLatestResults(options.filterDescription));
       allPrompts = null;
     }
   }, 250);
+
   fs.watchFile(watchFilePath, watcher);
 
   io.on('connection', async (socket) => {
-    socket.emit('init', await readLatestResults(filterDescription));
+    socket.emit('init', await readLatestResults(options.filterDescription));
   });
 
   app.get('/api/results', (req, res) => {
-    const previousResults = listPreviousResults(undefined /* limit */, filterDescription);
+    const previousResults = listPreviousResults(undefined /* limit */, options.filterDescription);
     res.json({
       data: previousResults.map((meta) => {
         return {
@@ -208,7 +248,7 @@ export async function startServer(
 
   app.get('/api/config', (req, res) => {
     res.json({
-      apiBaseUrl: apiBaseUrl || '',
+      apiBaseUrl: options.apiBaseUrl || '',
     });
   });
 
@@ -225,13 +265,9 @@ export async function startServer(
     };
   });
 
-  // Must come after the above routes (particularly /api/config) so it doesn't
-  // overwrite dynamic routes.
-  app.use(express.static(staticDir));
-
   httpServer.listen(port, () => {
     const url = `http://localhost:${port}`;
-    logger.info(`Server running at ${url} and monitoring for new evals.`);
+    logger.info(`API Server running at ${url} and monitoring for new evals.`);
 
     const openUrl = async () => {
       try {
@@ -242,9 +278,9 @@ export async function startServer(
       }
     };
 
-    if (browserBehavior === BrowserBehavior.OPEN) {
+    if (options.browserBehavior === BrowserBehavior.OPEN) {
       openUrl();
-    } else if (browserBehavior === BrowserBehavior.ASK) {
+    } else if (options.browserBehavior === BrowserBehavior.ASK) {
       const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,

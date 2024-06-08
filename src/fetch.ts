@@ -1,16 +1,3 @@
-import fetch from 'node-fetch';
-import { ProxyAgent } from 'proxy-agent';
-
-import type { RequestInfo, RequestInit, Response } from 'node-fetch';
-
-export async function fetchWithProxy(
-  url: RequestInfo,
-  options: RequestInit = {},
-): Promise<Response> {
-  options.agent = new ProxyAgent();
-  return fetch(url, options);
-}
-
 export function fetchWithTimeout(
   url: RequestInfo,
   options: RequestInit = {},
@@ -26,7 +13,7 @@ export function fetchWithTimeout(
       reject(new Error(`Request timed out after ${timeout} ms`));
     }, timeout);
 
-    fetchWithProxy(url, options)
+    fetch(url, options)
       .then((response) => {
         clearTimeout(timeoutId);
         resolve(response);

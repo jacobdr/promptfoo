@@ -1,0 +1,7 @@
+{
+  "name": "commonjs-test",
+  "type": "commonjs",
+  "dependencies": {
+    "promptfoo": "file:../../.."
+  }
+}

@@ -31,6 +31,7 @@ import GenerateTestCases from '@/app/eval/GenerateTestCases';
 import { getApiBaseUrl } from '@/api';
 import { useStore as useResultsViewStore } from './store';
 import { useStore as useMainStore } from '@/app/eval/store';
+import Image from 'next/image';
 
 import type { CellContext, ColumnDef, VisibilityState } from '@tanstack/table-core';
 
@@ -313,15 +314,16 @@ function EvalOutputCell({
     node = (
       <ReactMarkdown
         components={{
-          img: ({ src, alt }) => (
-            <img
-              loading="lazy"
-              src={src}
-              alt={alt}
-              onClick={() => toggleLightbox(src)}
-              style={{ cursor: 'pointer' }}
-            />
-          ),
+          img: ({ src, alt }) =>
+            src ? (
+              <Image
+                loading="lazy"
+                src={src}
+                alt={alt || 'No alt supplied'}
+                onClick={() => toggleLightbox(src)}
+                style={{ cursor: 'pointer' }}
+              />
+            ) : null,
         }}
       >
         {text}
@@ -600,7 +602,7 @@ function EvalOutputCell({
       {actions}
       {lightboxOpen && lightboxImage && (
         <div className="lightbox" onClick={() => toggleLightbox()}>
-          <img src={lightboxImage} alt="Lightbox" />
+          <Image src={lightboxImage} alt="Lightbox" />
         </div>
       )}
       <CommentDialog

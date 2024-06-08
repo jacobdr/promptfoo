@@ -34,6 +34,7 @@ describe('Telemetry', () => {
   });
 
   it('should record events when telemetry is enabled', () => {
+    process.env.PROMPTFOO_DISABLE_TELEMETRY = '0';
     const telemetry = new Telemetry();
     telemetry.record('eval_ran', { foo: 'bar' });
     expect(telemetry['events']).toHaveLength(1);
@@ -45,6 +46,8 @@ describe('Telemetry', () => {
   });
 
   it('should send events and clear events array when telemetry is enabled and send is called', async () => {
+    process.env.PROMPTFOO_DISABLE_TELEMETRY = '0';
+
     (fetchWithTimeout as jest.Mock).mockResolvedValue({ ok: true });
 
     const telemetry = new Telemetry();

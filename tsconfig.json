@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "rootDir": ".",
     "declaration": true,
     "declarationMap": true,
     "esModuleInterop": true,
@@ -10,14 +11,15 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "incremental": true,
+    "composite": true,
+    "noEmit": false
   },
-  "include": ["src/", "typings/**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "src/web/client/**/*",
-    "src/web/nextui/**/*",
-    "src/workers/**/*"
-  ]
+  // NOTE: this is broken -- not all providers are output -- see
+  // https://github.com/microsoft/TypeScript/issues/30602
+  // "references": [{ "path": "./src/web/nextui" }],
+  "include": ["package.json", "src", "typings", "src/providers"],
+  "exclude": ["node_modules", "**/dist/**", "src/web/nextui", "**/src/web/nextui/dist/**"]
 }

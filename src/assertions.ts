@@ -1070,7 +1070,7 @@ ${
         throw new Error(`Webhook response status: ${response.status}`);
       }
 
-      const jsonResponse = await response.json();
+      const jsonResponse = (await response.json()) as Partial<GradingResult>;
       pass = jsonResponse.pass !== inverse;
       score =
         typeof jsonResponse.score === 'undefined'
@@ -1078,8 +1078,8 @@ ${
             ? 1
             : 0
           : inverse
-          ? 1 - jsonResponse.score
-          : jsonResponse.score;
+            ? 1 - jsonResponse.score
+            : jsonResponse.score;
 
       const reason =
         jsonResponse.reason ||

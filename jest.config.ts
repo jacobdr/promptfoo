@@ -14,13 +14,30 @@ const config: Config = {
     '(.+)\\.js': '$1',
   },
   */
-  modulePathIgnorePatterns: ['<rootDir>/examples', '<rootDir>/node_modules', '<rootDir>/dist'],
-  setupFiles: ['<rootDir>/.jest/setEnvVars.js'],
-  testPathIgnorePatterns: ['<rootDir>/examples', '<rootDir>/node_modules', '<rootDir>/dist'],
+  setupFiles: ['<rootDir>/.jest/setEnvVars.js', '<rootDir>/.jest/mockFetch.js'],
+  testPathIgnorePatterns: [
+    '<rootDir>/examples',
+    '<rootDir>/node_modules',
+    '<rootDir>/dist',
+    '<rootDir>/test/integration',
+    '<rootDir>/src/web/nextui/dist',
+  ],
+  modulePathIgnorePatterns: [
+    '<rootDir>/examples',
+    '<rootDir>/node_modules',
+    '<rootDir>/dist',
+    '<rootDir>/src/web/nextui/dist',
+  ],
+  // These are packages that are ESM-only, which jest chokes on, and this forces them to get
+  // transpiled to CommonJS so they can run through jest
+  transformIgnorePatterns: [
+    'node_modules/(?!(chalk|data-uri-to-buffer|fetch-blob|formdata-polyfill))',
+  ],
   transform: {
-    '^.+\\.js$': 'babel-jest',
+    // '^.+\\.js$': 'babel-jest',
     '^.+\\.m?[tj]sx?$': ['ts-jest', tsJestConfig],
   },
+  verbose: true,
 };
 
 export default config;

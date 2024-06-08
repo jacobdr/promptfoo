@@ -5,6 +5,7 @@ import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Layout from '@theme/Layout';
 import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import HomepageInfo from '@site/src/components/HomepageInfo';
+import Image from 'next/image';
 
 import styles from './index.module.css';
 
@@ -40,18 +41,20 @@ export default function Home(): JSX.Element {
         <div style={{ textAlign: 'center', padding: '2rem 0 4rem 0' }}>
           <h4>Web Viewer</h4>
           <Link to="/docs/intro">
-            <img
+            <Image
               style={{ maxWidth: 'min(100%, 1024px)' }}
               src="https://user-images.githubusercontent.com/310310/261666627-ce5a7817-da82-4484-b26d-32474f1cabc5.png"
+              alt="Intro docs"
             />
           </Link>
         </div>
         <div style={{ textAlign: 'center', padding: '2rem 0 8rem 0' }}>
           <h4>Command line</h4>
           <Link to="/docs/intro">
-            <img
+            <Image
               style={{ maxWidth: 'min(100%, 1024px)' }}
               src="https://user-images.githubusercontent.com/310310/244891726-480e1114-d049-40b9-bd5f-f81c15060284.gif"
+              alt="CLI docs"
             />
           </Link>
         </div>

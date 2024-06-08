@@ -1,12 +1,13 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "rootDir": "../../..",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
     "esModuleInterop": true,
     "module": "esnext",
     "moduleResolution": "bundler",
@@ -15,6 +16,8 @@
     "jsx": "preserve",
     "incremental": true,
     "downlevelIteration": true,
+    "composite": true,
+    "outDir": "./dist",
     "plugins": [
       {
         "name": "next"
@@ -25,11 +28,12 @@
     }
   },
   "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
+    "./next-env.d.ts",
     ".next/types/**/*.ts",
-    "../../../typings/**/*"
+    "../../../src",
+    // "src",
+    "../../../typings",
+    "../../../package.json"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "./dist", "../../../dist"]
 }

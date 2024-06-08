@@ -13,9 +13,11 @@ env:
   OPENAI_API_KEY: xxx
   AZURE_OPENAI_API_HOST: xxx
   ANTHROPIC_API_KEY: xxx
+  PROMPTFOO_DISABLE_TELEMETRY: 1
+
 jobs:
   build:
-    name: Build and test on Node ${{ matrix.node }} and ${{ matrix.os }}
+    name: Build + test - Node ${{ matrix.node }} / ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -40,6 +42,13 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Check Versions
+        run: |
+          echo "node version"
+          node --version
+          echo "npm version"
+          npm --version
+
       - name: Install Dependencies
         run: |
           npm ci
@@ -48,12 +57,103 @@ jobs:
         run: |
           npm exec check-dependency-version-consistency
 
+      - name: Compile
+        run: |
+          npm run compile
+
       - name: Test
-        run: npm run test --ci --coverage --maxWorkers=2
+        run: npm run test --ci --coverage
 
       - name: Build
         run: npm run build
 
+      - name: Integration Test
+        run: |
+          bash test/integration/run-integration-test.sh
+
+      # Make sure that the CLI vaguely works
+      - name: Sanity Check
+        run: |
+          npm exec -- promptfoo --help
+          npm exec -- promptfoo init --no-interactive
+
+      # This is a sanity check -- we should bump the size as needed, but be cautious
+      # about it. Run it on ubutu so we don't have to deal with getting the size on windows
+      - name: Dependency Size
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          set -x
+          du -sh dist
+          du -sk dist
+          # 40 MB limit
+          PACKAGE_BYTE_LIMIT_KB=40000
+          BYTE_SIZE_OF_PACKAGE=$(du -sk dist | awk '{print $1}')
+          if [[ $BYTE_SIZE_OF_PACKAGE -gt  $PACKAGE_BYTE_LIMIT_KB ]]; then
+            echo "Package is too large! Either bump the maximum allowed size, or check your changes if you did not expect such a large increase"
+            echo "The KB limit is: ${PACKAGE_BYTE_LIMIT_KB}"
+            exit 1
+          fi
+
+  docker:
+    runs-on: ubuntu-latest
+    env:
+      # The PORT for the UI to run on
+      DEFAULT_PORT: 15500
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+      # https://github.com/marketplace/actions/docker-setup-buildx
+      - name: Setup Docker
+        uses: docker/setup-buildx-action@v3
+      - name: 'Build Image: CLI'
+        uses: docker/build-push-action@v5
+        with:
+          target: cli
+          context: .
+          push: false
+          load: true
+          tags: promptfoo:cli
+          cache-from: |
+            type=gha
+          cache-to: |
+            type=gha,mode=max
+      - name: 'Build Image: Site'
+        uses: docker/build-push-action@v5
+        with:
+          target: site
+          context: .
+          push: false
+          load: true
+          tags: promptfoo:site
+          cache-from: |
+            type=gha
+      - name: 'Test: CLI'
+        run: |
+          TEST_DIR="/tmp/test_project"
+          echo "TEST_DIR:${TEST_DIR}"
+          mkdir -p "${TEST_DIR}"
+          EXPECTED_VERSION=$(cat package.json | jq -r '.version')
+          VERSION_OUTPUT=$(docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --rm promptfoo:cli --version)
+          if ! grep "${EXPECTED_VERSION}" <<< $VERSION_OUTPUT; then
+            echo "Exepected version not found in --version output"
+            echo "Expected: ${EXPECTED_VERSION}"
+            echo "===="
+            echo "Received: ${VERSION_OUTPUT}"
+            exit 1
+          fi
+
+          set -x
+          docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --volume "${TEST_DIR}:${TEST_DIR}" --workdir "${TEST_DIR}" promptfoo:cli init --no-interactive
+          if [[ ! -f "${TEST_DIR}/promptfooconfig.yaml" ]]; then
+            echo "Expected config file to get generated to ${TEST_DIR} but it was not found"
+            exit 1
+          fi
+      - name: 'Test: Site'
+        run: |
+          docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --detach -p 15500:15500 promptfoo:site
+          # Give the server time to start up
+          sleep 3
+          curl -vv --fail http://localhost:15500/
   style-check:
     name: Style Check
     runs-on: ubuntu-latest

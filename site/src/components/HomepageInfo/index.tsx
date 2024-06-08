@@ -2,6 +2,7 @@ import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import CodeBlock from '@theme/CodeBlock';
+import Image from 'next/image';
 
 import styles from './styles.module.css';
 
@@ -18,19 +19,23 @@ export default function HomepageInfo(): JSX.Element {
         <div className="container">
           <h2 className={styles.blurb}>Used by 10,000+ developers at companies like</h2>
           <div className={styles.logoContainer}>
-            <img src="/img/brands/discord-logo-blue.svg" alt="Discord" />
-            <img style={{ maxWidth: '85px' }} src="/img/brands/google-logo.svg" alt="Google" />
-            <img
+            <Image src="/img/brands/discord-logo-blue.svg" alt="Discord" />
+            <Image style={{ maxWidth: '85px' }} src="/img/brands/google-logo.svg" alt="Google" />
+            <Image
               style={{ maxWidth: '100px' }}
               src="/img/brands/microsoft-logo.svg"
               alt="Microsoft"
             />
-            <img
+            <Image
               style={{ maxHeight: '50px' }}
               src="/img/brands/salesforce-logo.svg"
               alt="Salesforce"
             />
-            <img style={{ maxHeight: '120px' }} src="/img/brands/carvana-logo.svg" alt="Carvana" />
+            <Image
+              style={{ maxHeight: '120px' }}
+              src="/img/brands/carvana-logo.svg"
+              alt="Carvana"
+            />
           </div>
         </div>
       </section>

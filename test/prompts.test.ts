@@ -9,10 +9,6 @@ import type { Prompt } from '../src/types';
 
 jest.mock('../src/esm');
 
-jest.mock('proxy-agent', () => ({
-  ProxyAgent: jest.fn().mockImplementation(() => ({})),
-}));
-
 jest.mock('glob', () => ({
   globSync: jest.fn(),
 }));

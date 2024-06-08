@@ -1,5 +1,3 @@
-import fetch from 'node-fetch';
-
 import type {
   ApiProvider,
   ProviderResponse,
@@ -55,7 +53,16 @@ class PromptfooHarmfulCompletionProvider implements ApiProvider {
       }
 
       const data = await response.json();
+      const dataIsObject = typeof data === 'object' && !Array.isArray(data) && data !== null;
+
       logger.debug(`promptfoo API call response: ${JSON.stringify(data)}`);
+      if (!dataIsObject) {
+        throw new Error('Response data is not a valid JSON object');
+      }
+
+      if (!data || !('output' in data) || typeof data.output !== 'string') {
+        throw new Error('Response data output field is not a string, which was expected');
+      }
       return {
         output: data.output,
       };

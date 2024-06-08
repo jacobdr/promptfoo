@@ -10,3 +10,6 @@ __pycache__
 
 # jest
 .coverage
+
+# integration tests
+test/integration/typescript/index.js
