@@ -17,7 +17,7 @@ env:
 
 jobs:
   build:
-    name: Build and test on Node ${{ matrix.node }} and ${{ matrix.os }}
+    name: Build + test - Node ${{ matrix.node }} / ${{ matrix.os }}
 
     runs-on: ${{ matrix.os }}
     strategy:
