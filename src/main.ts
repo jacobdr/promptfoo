@@ -7,6 +7,7 @@ import chalk from 'chalk';
 import chokidar from 'chokidar';
 import yaml from 'js-yaml';
 import { Command } from 'commander';
+import { version } from '../package.json';
 
 import cliState from './cliState';
 import telemetry from './telemetry';
@@ -219,12 +220,7 @@ async function main() {
 
   const program = new Command();
 
-  program.option('--version', 'Print version', () => {
-    const packageJson = JSON.parse(
-      fs.readFileSync(path.join(getDirectory(), '../package.json'), 'utf8'),
-    );
-    logger.info(packageJson.version);
-  });
+  program.version(version);
 
   program
     .command('init [directory]')

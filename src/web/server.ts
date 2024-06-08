@@ -61,9 +61,7 @@ export enum BrowserBehavior {
 const DEFAULT_SERVER_PORT = 15500;
 
 /**
- * We actually run 2 servers as of this writing-- one for the Next application and one
- * for the Express server. In the future it would be ideal if we could
- * just re-use the NextJS API routes
+ * Re-use the express server as the handler for the NextJS UI
  */
 export async function startServer(options: IServerOptions) {
   const port = options.port || Number.parseInt(process.env.PORT || '') || DEFAULT_SERVER_PORT;
@@ -121,6 +119,7 @@ export async function startServer(options: IServerOptions) {
       allPrompts = null;
     }
   }, 250);
+
   fs.watchFile(watchFilePath, watcher);
 
   io.on('connection', async (socket) => {
