@@ -67,8 +67,8 @@ jobs:
       # Make sure that the CLI vaguely works
       - name: Sanity Check
         run: |
-          npm exec promptfoo -- --help
-          npm exec promptfoo -- init --no-interactive
+          npm exec -- promptfoo --help
+          npm exec -- promptfoo init --no-interactive
 
       # This is a sanity check -- we should bump the size as needed, but be cautious
       # about it. Run it on ubutu so we don't have to deal with getting the size on windows
