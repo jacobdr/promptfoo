@@ -122,7 +122,7 @@ jobs:
             type=gha
       - name: 'Test: CLI'
         run: |
-          TEST_DIR="${PWD}/test_project"
+          TEST_DIR="/tmp/test_project"
           echo "TEST_DIR:${TEST_DIR}"
           EXPECTED_VERSION=$(cat package.json | jq -r '.version')
           VERSION_OUTPUT=$(docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --rm promptfoo:cli --version)
