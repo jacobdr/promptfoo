@@ -123,7 +123,7 @@ jobs:
             echo "Received: ${VERSION_OUTPUT}"
             exit 1
           fi
-          docker run -v "${TEST_DIR}:${TEST_DIR}" promptfoo:cli init --no-interactive "${TEST_DIR}"
+          docker run --volume "${TEST_DIR}:${TEST_DIR}" --workdir "${TEST_DIR}" promptfoo:cli init --no-interactive "${TEST_DIR}"
           if [[ ! -f "${TEST_DIR}/promptfooconfig.yaml" ]]; then
             echo "Expected config file to get generated to ${TEST_DIR} but it was not found"
             exit 1
