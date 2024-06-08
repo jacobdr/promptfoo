@@ -73,10 +73,11 @@ jobs:
       # This is a sanity check -- we should bump the size as needed, but be cautious
       # about it. Run it on ubutu so we don't have to deal with getting the size on windows
       - name: Dependency Size
-        if: ${{ matrix.os }} == "ubuntu-latest"
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
+          set +x
           du -sh dist
-          du -s dist
+          du -sk dist
           # 40 MB limit
           PACKAGE_BYTE_LIMIT_KB=40000
           BYTE_SIZE_OF_PACKAGE=$(du -sk dist | awk '{print $1}')
