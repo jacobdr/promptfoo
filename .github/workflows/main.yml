@@ -42,6 +42,13 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      - name: Check Versions
+        run: |
+          echo "node version"
+          node --version
+          echo "npm version"
+          npm --version
+
       - name: Install Dependencies
         run: |
           npm ci
