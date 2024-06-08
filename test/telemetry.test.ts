@@ -34,6 +34,7 @@ describe('Telemetry', () => {
   });
 
   it('should record events when telemetry is enabled', () => {
+    process.env.PROMPTFOO_DISABLE_TELEMETRY = '0';
     const telemetry = new Telemetry();
     telemetry.record('eval_ran', { foo: 'bar' });
     expect(telemetry['events']).toHaveLength(1);

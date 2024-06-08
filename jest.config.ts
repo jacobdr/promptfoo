@@ -20,8 +20,14 @@ const config: Config = {
     '<rootDir>/node_modules',
     '<rootDir>/dist',
     '<rootDir>/test/integration',
+    '<rootDir>/src/web/nextui/dist',
   ],
-  modulePathIgnorePatterns: ['<rootDir>/examples', '<rootDir>/node_modules', '<rootDir>/dist'],
+  modulePathIgnorePatterns: [
+    '<rootDir>/examples',
+    '<rootDir>/node_modules',
+    '<rootDir>/dist',
+    '<rootDir>/src/web/nextui/dist',
+  ],
   // These are packages that are ESM-only, which jest chokes on, and this forces them to get
   // transpiled to CommonJS so they can run through jest
   transformIgnorePatterns: [

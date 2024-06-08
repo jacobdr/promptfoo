@@ -13,6 +13,7 @@ env:
   OPENAI_API_KEY: xxx
   AZURE_OPENAI_API_HOST: xxx
   ANTHROPIC_API_KEY: xxx
+  PROMPTFOO_DISABLE_TELEMETRY: 1
 
 jobs:
   build:
@@ -122,7 +123,7 @@ jobs:
         run: |
           TEST_DIR="${PWD}/test_project"
           EXPECTED_VERSION=$(cat package.json | jq -r '.version')
-          VERSION_OUTPUT=$(docker run --rm promptfoo:cli --version)
+          VERSION_OUTPUT=$(docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --rm promptfoo:cli --version)
           if ! grep "${EXPECTED_VERSION}" <<< $VERSION_OUTPUT; then
             echo "Exepected version not found in --version output"
             echo "Expected: ${EXPECTED_VERSION}"
@@ -130,14 +131,16 @@ jobs:
             echo "Received: ${VERSION_OUTPUT}"
             exit 1
           fi
-          docker run --volume "${TEST_DIR}:${TEST_DIR}" --workdir "${TEST_DIR}" promptfoo:cli init --no-interactive "${TEST_DIR}"
+
+          set +x
+          docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --volume "${TEST_DIR}:${TEST_DIR}" --workdir "${TEST_DIR}" promptfoo:cli init --no-interactive "${TEST_DIR}"
           if [[ ! -f "${TEST_DIR}/promptfooconfig.yaml" ]]; then
             echo "Expected config file to get generated to ${TEST_DIR} but it was not found"
             exit 1
           fi
       - name: 'Test: Site'
         run: |
-          docker run --detach -p 15500:15500 prompfoo:site
+          docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --detach -p 15500:15500 prompfoo:site
           # Give the server time to start up
           sleep 3
           curl -vv --fail http://localhost:15500/
