@@ -115,7 +115,10 @@ jobs:
           fi
       - name: 'Test: Site'
         run: |
-          docker run --detach prompfoo:site
+          docker run --detach -p 15500:15500 prompfoo:site
+          # Give the server time to start up
+          sleep 3
+          curl -vv --fail http://localhost:15500/
   style-check:
     name: Style Check
     runs-on: ubuntu-latest
