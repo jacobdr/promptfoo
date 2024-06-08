@@ -63,6 +63,21 @@ jobs:
         run: |
           bash test/integration/run-integration-test.sh
 
+      # This is a sanity check -- we should bump the size as needed, but be cautious
+      # about it. Run it on ubutu so we don't have to deal with getting the size on windows
+      - name: Dependency Size
+        if: ${{ matrix.os }} == "ubuntu-latest"
+        run: |
+          du -sh dist
+          du -s dist
+          # 40 MB limit
+          PACKAGE_BYTE_LIMIT=40000
+          BYTE_SIZE_OF_PACKAGE=$(du -s dist | awk '{print $1}')
+          if [[ $BYTE_SIZE_OF_PACKAGE -gt  $PACKAGE_BYTE_LIMIT ]]; then
+            echo "Package is too large! Either bump the maximum allowed size, or check your changes if you did not expect such a large increase"
+            exit 1
+          fi
+
   docker:
     runs-on: ubuntu-latest
     env:
