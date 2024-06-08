@@ -143,7 +143,7 @@ jobs:
           fi
       - name: 'Test: Site'
         run: |
-          docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --detach -p 15500:15500 prompfoo:site
+          docker run -e PROMPTFOO_DISABLE_TELEMETRY=1 --detach -p 15500:15500 promptfoo:site
           # Give the server time to start up
           sleep 3
           curl -vv --fail http://localhost:15500/
